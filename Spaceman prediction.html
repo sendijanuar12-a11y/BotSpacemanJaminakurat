@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaceman Prediction - Pro Tool</title>
+    <style>
+        :root {
+            --bg-deep: #050b14;
+            --bg-card: #0f1926;
+            --primary: #4f46e5;
+            --primary-glow: #4f46e580;
+            --accent: #d946ef;
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+            --gold: #fbbf24;
+            --red: #ef4444;
+            --green: #10b981;
+            --glass: rgba(15, 25, 38, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            animation: starsMove 100s linear infinite;
+        }
+
+        @keyframes starsMove {
+            from { background-position: 0 0, 40px 60px, 130px 270px; }
+            to { background-position: 550px 550px, 390px 410px, 380px 520px; }
+        }
+
+        /* Header & Marquee */
+        header {
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            padding: 1rem 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .marquee-container {
+            background: rgba(220, 38, 38, 0.15); /* Background merah transparan */
+            border-top: 2px solid var(--red);
+            border-bottom: 2px solid var(--red);
+            color: var(--red);
+            font-size: 0.9rem; /* Font size sedikit diperbesar agar terbaca */
+            padding: 8px 0;
+            margin-bottom: 15px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 18s linear infinite; /* Kecepatan sedikit dilambatkan agar teks panjang terbaca */
+        }
+
+        @keyframes marquee {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: linear-gradient(to right, #818cf8, #e879f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(129, 140, 248, 0.3);
+        }
+
+        /* Container */
+        main {
+            flex: 1;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .stat-hot { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+        .stat-cold { color: var(--primary); }
+        .stat-good { color: var(--green); }
+
+        /* Main Prediction Card */
+        .prediction-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(79, 70, 229, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        /* Spaceman Image Area */
+        .spaceman-container {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .spaceman-img {
+            width: 100px;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+            animation: float 3s ease-in-out infinite;
+            transition: transform 0.3s;
+        }
+
+        .spaceman-img.high-boost {
+            animation: flyUp 0.5s ease-out forwards;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes flyUp {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+            100% { transform: translateY(-10px) scale(1); }
+        }
+
+        .display-result {
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .result-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(to bottom, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(165, 180, 252, 0.4));
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: rgba(255,255,255,0.1);
+            color: var(--text-sub);
+        }
+
+        .status-badge.safe { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
+        .status-badge.risk { background: rgba(239, 68, 68, 0.2); color: var(--red); border: 1px solid var(--red); }
+
+        /* Controls */
+        .btn-action {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-predict {
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            margin-bottom: 1rem;
+        }
+
+        .btn-predict:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6); }
+        .btn-predict:active { transform: translateY(1px); }
+        .btn-predict:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-play {
+            background: linear-gradient(90deg, #f59e0b, #ea580c);
+            color: white;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            border: 1px solid #fcd34d;
+        }
+
+        .btn-play:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(245, 158, 11, 0.6); }
+
+        /* History Grid */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .history-ball {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ball-high { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+        .ball-med { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .ball-low { background: linear-gradient(135deg, #ef4444, #b91c1c); opacity: 0.7; }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* Loading Bar */
+        .progress-container {
+            height: 4px;
+            background: #1e293b;
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-sub);
+            font-size: 0.7rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="marquee-container">
+            <div class="marquee-content">
+                BOT Spaceman ini hanya bisa berlaku di situs Lucky303 jika tidak akurat di situs lain jangan salah kan BOT nya!!!
+            </div>
+        </div>
+        <h1>Spaceman Prediction</h1>
+    </header>
+
+    <main>
+        <!-- Stats Panel -->
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-label">Tren Server</div>
+                <div class="stat-value" id="trenValue">STABIL</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">RTP Live</div>
+                <div class="stat-value stat-good" id="rtpValue">98.5%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Akurasi</div>
+                <div class="stat-value">87%</div>
+            </div>
+        </div>
+
+        <!-- Kartu Utama -->
+        <section class="prediction-card">
+            <!-- Gambar Bocil Spaceman -->
+            <div class="spaceman-container">
+                <img src="https://i.imgur.com/1Gq9VU8.png" alt="Bocil Spaceman" class="spaceman-img" id="spacemanImg">
+            </div>
+
+            <div class="display-result">
+                <div class="result-label">Prediksi Crash Berikutnya</div>
+                <div class="result-number" id="predictionResult">--.x</div>
+                <div class="status-badge" id="statusBadge">Siap Menganalisa</div>
+                
+                <div class="progress-container" id="loadingContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+
+            <button class="btn-action btn-predict" id="btnPredict" onclick="runPrediction()">
+                🚀 ANALISA SEKARANG
+            </button>
+
+            <a href="https://lucky303.top/login.php" target="_blank" class="btn-action btn-play">
+                MAIN SEKARANG
+            </a>
+        </section>
+
+        <!-- History Section -->
+        <section>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.9rem; color: var(--text-sub); font-weight: bold;">RIWAYAT TERAKHIR</span>
+                <span style="font-size: 0.7rem; color: var(--primary);">Live Update</span>
+            </div>
+            <div class="history-grid" id="historyGrid">
+                <!-- History Items generated by JS -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Spaceman Prediction Tool.</p>
+        <p style="opacity: 0.5; margin-top: 5px;">Simulasi Algoritma Slot. Harap bertanggung jawab.</p>
+    </footer>
+
+    <script>
+        // --- KONFIGURASI ---
+        const MIN_MULTIPLIER = 1.00;
+        const MAX_MULTIPLIER = 10.00;
+        const THINKING_TIME = 500; // 0.5 Detik
+
+        // --- ELEMEM DOM ---
+        const btnPredict = document.getElementById('btnPredict');
+        const resultDisplay = document.getElementById('predictionResult');
+        const statusBadge = document.getElementById('statusBadge');
+        const historyGrid = document.getElementById('historyGrid');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const progressBar = document.getElementById('progressBar');
+        const spacemanImg = document.getElementById('spacemanImg');
+        
+        // Elemen Stats
+        const trenValue = document.getElementById('trenValue');
+        const rtpValue = document.getElementById('rtpValue');
+
+        let isProcessing = false;
+
+        // --- FUNGSI UTAMA ---
+        function runPrediction() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            // 1. Reset UI
+            btnPredict.disabled = true;
+            btnPredict.innerText = "MENGHITUNG POLA...";
+            resultDisplay.innerText = "...";
+            statusBadge.className = "status-badge";
+            statusBadge.innerText = "MENGHUBUNGKAN SERVER...";
+            spacemanImg.classList.remove('high-boost');
+            
+            // 2. Efek Loading Bar (Cepat 0.5s)
+            loadingContainer.style.display = "block";
+            progressBar.style.transition = "none";
+            progressBar.style.width = "0%";
+            
+            // Trigger reflow
+            void progressBar.offsetWidth;
+
+            progressBar.style.transition = `width ${THINKING_TIME}ms linear`;
+            progressBar.style.width = "100%";
+
+            // 3. Tunggu 0.5 Detik
+            setTimeout(() => {
+                finishPrediction();
+            }, THINKING_TIME);
+        }
+
+        function finishPrediction() {
+            // Generate Angka 1 - 10
+            const randomVal = Math.random() * (MAX_MULTIPLIER - MIN_MULTIPLIER) + MIN_MULTIPLIER;
+            const finalVal = randomVal.toFixed(2);
+
+            // Tampilkan Hasil
+            loadingContainer.style.display = "none";
+            resultDisplay.innerText = finalVal + "x";
+
+            // Logika Warna & Status
+            if (finalVal >= 5.00) {
+                statusBadge.innerText = "PREDIKSI: AMAN (HIGH)";
+                statusBadge.className = "status-badge safe";
+                resultDisplay.style.color = "var(--green)";
+                spacemanImg.classList.add('high-boost'); // Animasi terbang
+                updateStats("PANAS", "HOT");
+            } else if (finalVal <= 2.00) {
+                statusBadge.innerText = "PREDIKSI: BERBAHAYA";
+                statusBadge.className = "status-badge risk";
+                resultDisplay.style.color = "var(--red)";
+                updateStats("DINGIN", "COLD");
+            } else {
+                statusBadge.innerText = "PREDIKSI: STABIL";
+                statusBadge.className = "status-badge";
+                statusBadge.style.color = "var(--gold)";
+                statusBadge.style.borderColor = "var(--gold)";
+                resultDisplay.style.color = "#fff";
+                updateStats("STABIL", "NORMAL");
+            }
+
+            // Tambah ke History
+            addToHistory(finalVal);
+
+            // Reset Tombol
+            btnPredict.disabled = false;
+            btnPredict.innerText = "🚀 ANALISA LAGI";
+            isProcessing = false;
+        }
+
+        // --- FUNGSI TAMBAHAN ---
+
+        function addToHistory(value) {
+            const valNum = parseFloat(value);
+            let className = "ball-med";
+            
+            if (valNum >= 5.00) className = "ball-high";
+            else if (valNum <= 2.00) className = "ball-low";
+
+            const ball = document.createElement('div');
+            ball.className = `history-ball ${className}`;
+            ball.innerText = value;
+
+            // Insert di awal
+            historyGrid.insertBefore(ball, historyGrid.firstChild);
+
+            // Hapus jika lebih dari 12 biar rapi
+            if (historyGrid.children.length > 12) {
+                historyGrid.removeChild(historyGrid.lastChild);
+            }
+        }
+
+        function updateStats(tren, mode) {
+            trenValue.innerText = tren;
+            if (mode === "HOT") {
+                trenValue.style.color = "var(--gold)";
+                trenValue.style.textShadow = "0 0 10px var(--gold)";
+                rtpValue.innerText = (98 + Math.random()).toFixed(1) + "%";
+            } else if (mode === "COLD") {
+                trenValue.style.color = "var(--primary)";
+                trenValue.style.textShadow = "none";
+                rtpValue.innerText = (90 + Math.random() * 5).toFixed(1) + "%";
+            } else {
+                trenValue.style.color = "#fff";
+                trenValue.style.textShadow = "none";
+                rtpValue.innerText = (96 + Math.random() * 2).toFixed(1) + "%";
+            }
+        }
+
+        // Isi History Palsu saat load biar tidak kosong
+        window.addEventListener('DOMContentLoaded', () => {
+            for(let i=0; i<6; i++) {
+                const dummy = (Math.random() * (MAX_MULTIPLIER - MIN_MULTIPLIER) + MIN_MULTIPLIER).toFixed(2);
+                addToHistory(dummy);
+            }
+        });
+
+    </script>
+</body>
+</html>
